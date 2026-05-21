@@ -49,9 +49,8 @@ Built with **C# WPF** and integrating deeply with the **Windows API (Win32)**, S
 To ensure operational flexibility for invigilators without compromising security, SEB implements a sophisticated dual-layer exit strategy:
 
 1.  **Dynamic RAM Password (Session Layer):** Upon launch, the invigilator enters a custom one-time password. This password is kept strictly in volatile memory (RAM) and is securely wiped upon exit.
-2.  **Super-Admin Fallback (Cryptographic Layer):** If the session password is forgotten, the system falls back to a hardcoded **SHA-256 Hashed** master key. 
-    *   *Test the fallback:* Press `Ctrl + Shift + Q` to exit and enter the Super-Admin phrase: `SuperAdmin-999`.
-
+2.  **Super-Admin Fallback (Cryptographic Layer):** If the session password is forgotten, the system falls back to a hardcoded **SHA-256 Hashed** master key.
+    *   *Emergency Support:* In case of an emergency lockdown lockout, authorized invigilators can instantly request the cryptographic bypass key by contacting the system architect directly via Telegram: [@xamidovc_dev](https://t.me/xamidovc_dev).
 ---
 
 ## 📥 Installation & Usage
