@@ -1,7 +1,7 @@
 <div align="center">
   
   <!-- Agar logotipingiz bo'lsa, shu yerga linkini qo'yasiz -->
-  <img src="https://www.flaticon.com/free-icon/cyber-security_5964156" alt="SEB Logo">
+  <img src="https://img.icons8.com/color/120/000000/security-checked.png" alt="SEB Logo">
 
   <h1>🛡️ Safe Exam Browser (SEB)</h1>
   <p><strong>Enterprise-Grade Lockdown Browser for Secure Online Assessments</strong></p>
