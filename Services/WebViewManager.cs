@@ -50,17 +50,41 @@ namespace SafeExamBrowser.Services
         {
             _logger("[WebViewManager] Initializing WebView2 engine...");
 
-            // Create an isolated user data folder in %LocalAppData%\SafeExamBrowser
-            // CRITICAL: Do NOT use the application directory (e.g., Program Files) —
-            // it is read-only and causes WebView2 to crash silently on startup.
-            // %LocalAppData% is always writable, even under elevated admin contexts.
+            // ── Build a robust user data folder path ────────────────────
+            // Use CommonApplicationData (C:\ProgramData) instead of LocalAppData.
+            //
+            // WHY: When the app runs as Administrator (elevated), %LocalAppData%
+            // resolves to the Administrator profile's path. WebView2's Chromium
+            // runtime can fail with E_ABORT ("Microsoft Edge can't read and write
+            // to its data directory") due to UAC profile-path isolation conflicts.
+            //
+            // C:\ProgramData is always fully writable by elevated (Admin) processes
+            // and avoids per-user profile redirection issues entirely.
             _userDataFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "SafeExamBrowser",
-                AppConfig.WebView2UserDataFolder,
-                Guid.NewGuid().ToString("N") // Unique per session
+                "WebView2Data",
+                Guid.NewGuid().ToString("N") // Unique per session — prevents lock conflicts
             );
 
+            // ── Pre-create the directory BEFORE WebView2 touches it ─────
+            // CoreWebView2Environment.CreateAsync expects the folder to be
+            // accessible. If it doesn't exist or can't be created, WebView2
+            // throws a generic COM error with no useful message.
+            try
+            {
+                Directory.CreateDirectory(_userDataFolder);
+                _logger($"[WebViewManager] User data folder created: {_userDataFolder}");
+            }
+            catch (Exception ex)
+            {
+                _logger($"[WebViewManager] FATAL: Cannot create user data folder: {ex.Message}");
+                throw new InvalidOperationException(
+                    $"Failed to create WebView2 data directory at '{_userDataFolder}'. " +
+                    $"Ensure the application has write access to C:\\ProgramData.", ex);
+            }
+
+            // ── Create the WebView2 environment with our custom path ────
             var environment = await CoreWebView2Environment.CreateAsync(
                 userDataFolder: _userDataFolder
             );

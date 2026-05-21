@@ -12,6 +12,7 @@
      - Topmost="False" — OS is NOT locked yet; no need to steal focus.
      - ResizeMode="NoResize" — Clean, fixed-size dialog.
      - WindowStartupLocation="CenterScreen" — Always centered.
+     - SizeToContent="Height" — Window auto-expands to fit all content.
      - Styled to match the kiosk's dark theme (#1a1a2e / #e94560).
      ==================================================================== -->
 <Window x:Class="SafeExamBrowser.SetupWindow"
@@ -19,14 +20,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Safe Exam Browser — Session Setup"
         Width="500"
-        Height="420"
+        SizeToContent="Height"
+        MinHeight="400"
         WindowStartupLocation="CenterScreen"
         WindowStyle="SingleBorderWindow"
         ResizeMode="NoResize"
         Background="#1a1a2e"
         ShowInTaskbar="True">
 
-    <Grid Margin="32">
+    <Grid Margin="32,32,32,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>  <!-- Row 0: Icon + Title -->
             <RowDefinition Height="Auto"/>  <!-- Row 1: Description -->
@@ -35,8 +37,7 @@
             <RowDefinition Height="Auto"/>  <!-- Row 4: Confirm label -->
             <RowDefinition Height="Auto"/>  <!-- Row 5: Confirm field -->
             <RowDefinition Height="Auto"/>  <!-- Row 6: Validation message -->
-            <RowDefinition Height="*"/>     <!-- Row 7: Spacer -->
-            <RowDefinition Height="Auto"/>  <!-- Row 8: Action button -->
+            <RowDefinition Height="Auto"/>  <!-- Row 7: Action buttons -->
         </Grid.RowDefinitions>
 
         <!-- ── Row 0: Header ──────────────────────────────────────── -->
@@ -106,18 +107,39 @@
                    FontSize="12"
                    Margin="0,8,0,0"/>
 
-        <!-- ── Row 8: Action Button ───────────────────────────────── -->
-        <Button x:Name="LockButton"
-                Grid.Row="8"
-                Content="🔐  Lock &amp; Start Exam"
-                Height="42"
-                FontSize="15"
-                FontWeight="Bold"
-                Background="#e94560"
-                Foreground="White"
-                BorderBrush="#e94560"
-                Cursor="Hand"
-                IsEnabled="False"
-                Click="LockButton_Click"/>
+        <!-- ── Row 7: Action Buttons ──────────────────────────────── -->
+        <StackPanel Grid.Row="7"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,20">
+
+            <Button x:Name="CancelButton"
+                    Content="Cancel"
+                    Width="110"
+                    Height="42"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Background="#2a2a4a"
+                    Foreground="#ccddee"
+                    BorderBrush="#3a3a5a"
+                    BorderThickness="1"
+                    Cursor="Hand"
+                    Margin="0,0,12,0"
+                    Click="CancelButton_Click"/>
+
+            <Button x:Name="LockButton"
+                    Content="🔐  Lock &amp; Start Exam"
+                    Width="200"
+                    Height="42"
+                    FontSize="15"
+                    FontWeight="Bold"
+                    Background="#e94560"
+                    Foreground="White"
+                    BorderBrush="#e94560"
+                    BorderThickness="1"
+                    Cursor="Hand"
+                    IsEnabled="False"
+                    Click="LockButton_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

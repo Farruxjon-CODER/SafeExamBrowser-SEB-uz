@@ -138,5 +138,17 @@ namespace SafeExamBrowser
                     MessageBoxImage.Error);
             }
         }
+        // ════════════════════════════════════════════════════════════════
+        // CANCEL
+        // ════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Closes the setup window without starting the exam session.
+        /// Since this is the startup window, closing it exits the application.
+        /// </summary>
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }
