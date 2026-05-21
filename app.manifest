@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ============================================================================
+  SafeExamBrowser - Application Manifest (UAC Elevation)
+  
+  PURPOSE:
+  Forces Windows to display a UAC (User Account Control) prompt when the
+  application is launched. The user MUST click "Yes" to grant Administrator
+  privileges. If they click "No", the application does not start.
+  
+  WHY ADMINISTRATOR IS REQUIRED:
+  1. Stage 3 (Registry): Writing to HKCU Policies requires elevated context
+     for policy enforcement to take immediate effect on some configurations
+  2. Stage 4 (Process Watchdog): Killing other users' processes (e.g.,
+     AnyDesk running as SYSTEM) requires SeDebugPrivilege, which is only
+     available to elevated processes
+  3. Future: Group Policy, firewall rules, and other hardening features
+     all require elevation
+  
+  SECURITY IMPLICATION:
+  Running as admin means our app has full system access. This is intentional
+  for a kiosk/exam browser, but it also means bugs could cause system damage.
+  All registry changes use try-finally with 5-layer cleanup to prevent this.
+  ============================================================================
+-->
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="SafeExamBrowser.app"/>
+  
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+    <security>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          requestedExecutionLevel:
+          
+          level="requireAdministrator"
+            → Forces UAC prompt. App runs with full admin token.
+            → Alternatives: "asInvoker" (no elevation), "highestAvailable"
+              (admin if available, standard otherwise)
+          
+          uiAccess="false"
+            → The app does NOT need to drive UI of higher-privilege windows.
+            → Setting this to "true" would require the EXE to be in a trusted
+              location (Program Files) and be Authenticode-signed.
+        -->
+        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10 and Windows 11 compatibility -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
+    </application>
+  </compatibility>
+</assembly>
