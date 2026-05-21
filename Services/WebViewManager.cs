@@ -22,6 +22,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+// Required for SessionManager access from the child Services namespace
+
 namespace SafeExamBrowser.Services
 {
     /// <summary>
@@ -97,9 +99,9 @@ namespace SafeExamBrowser.Services
             _logger("[WebViewManager] WebView2 initialized and locked down.");
             _logger($"[WebViewManager] User data folder: {_userDataFolder}");
 
-            // Navigate to the exam URL
-            _webView.CoreWebView2.Navigate(AppConfig.ExamUrl);
-            _logger($"[WebViewManager] Navigating to: {AppConfig.ExamUrl}");
+            // Navigate to the dynamically-provided exam URL
+            _webView.CoreWebView2.Navigate(SessionManager.ExamUrl);
+            _logger($"[WebViewManager] Navigating to: {SessionManager.ExamUrl}");
         }
 
         /// <summary>
@@ -318,7 +320,7 @@ namespace SafeExamBrowser.Services
             {
                 try
                 {
-                    _webView.CoreWebView2.Navigate(AppConfig.ExamUrl);
+                    _webView.CoreWebView2.Navigate(SessionManager.ExamUrl);
                     _logger("[WebViewManager] Recovered from render process failure.");
                 }
                 catch (Exception ex)
@@ -331,7 +333,14 @@ namespace SafeExamBrowser.Services
         // ── URL Filtering Logic ─────────────────────────────────────────
 
         /// <summary>
-        /// Validates a URL against the whitelist and blocked schemes.
+        /// Validates a URL against the dynamic exam domain and blocked schemes.
+        /// 
+        /// The allowed domain is derived at runtime from SessionManager.ExamUrl,
+        /// so any exam platform works without configuration changes.
+        /// Subdomains of the exam domain are also permitted (e.g., if the exam
+        /// URL is https://exam.university.edu, then cdn.exam.university.edu
+        /// is also allowed).
+        /// 
         /// Returns true if the URL is safe to navigate to.
         /// </summary>
         private bool IsUrlAllowed(string url)
@@ -358,19 +367,33 @@ namespace SafeExamBrowser.Services
                 return false;
             }
 
-            // Check domain against whitelist
+            // ── Derive allowed domain from the dynamic exam URL ─────────
             string host = uri.Host.ToLowerInvariant();
-            bool isAllowed = AppConfig.AllowedDomains.Any(domain =>
-                host.Equals(domain, StringComparison.OrdinalIgnoreCase) ||
-                host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase)
-            );
 
-            if (!isAllowed)
+            // If the exam URL is a localhost address, allow all localhost traffic
+            if (Uri.TryCreate(SessionManager.ExamUrl, UriKind.Absolute, out Uri? examUri))
             {
-                _logger($"[URL Filter] Domain not whitelisted: {host}");
+                string examHost = examUri.Host.ToLowerInvariant();
+
+                if (examHost == "localhost" || examHost == "127.0.0.1")
+                {
+                    // Allow any localhost/loopback navigation
+                    if (host == "localhost" || host == "127.0.0.1")
+                        return true;
+                }
+                else
+                {
+                    // Allow exact match or subdomain match
+                    if (host == examHost ||
+                        host.EndsWith("." + examHost, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
             }
 
-            return isAllowed;
+            _logger($"[URL Filter] Domain not allowed: {host}");
+            return false;
         }
 
         // ── Cleanup Utilities ───────────────────────────────────────────

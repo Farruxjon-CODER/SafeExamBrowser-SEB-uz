@@ -89,6 +89,20 @@ namespace SafeExamBrowser
         }
 
         // ════════════════════════════════════════════════════════════════
+        // DYNAMIC EXAM URL (RAM-only, per-session)
+        // ════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// The exam URL provided by the teacher at session setup.
+        /// Stored in RAM only — never persisted to disk.
+        ///
+        /// This replaces the hardcoded AppConfig.ExamUrl, turning
+        /// the browser into a universal B2B solution that works with
+        /// any exam platform.
+        /// </summary>
+        public static string ExamUrl { get; set; } = string.Empty;
+
+        // ════════════════════════════════════════════════════════════════
         // PUBLIC API
         // ════════════════════════════════════════════════════════════════
 

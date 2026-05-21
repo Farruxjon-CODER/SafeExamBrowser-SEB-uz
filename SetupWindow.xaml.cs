@@ -1,27 +1,33 @@
 // ============================================================================
-// SafeExamBrowser — SetupWindow.xaml.cs (Pre-boot Session Password)
+// SafeExamBrowser — SetupWindow.xaml.cs (Pre-boot Session Setup)
 //
 // LIFECYCLE:
 //   1. Teacher launches the app → this window appears (OS is NOT locked).
-//   2. Teacher enters + confirms a one-time exit password.
+//   2. Teacher enters the exam URL + creates a one-time exit password.
 //   3. Teacher clicks "Lock & Start Exam":
-//      a) Password is stored in RAM via SessionManager.SetSessionPassword().
-//      b) This window closes.
-//      c) MainWindow opens → all lockdown stages (1-4) activate.
+//      a) URL is validated and stored in SessionManager.ExamUrl.
+//      b) Password is stored in RAM via SessionManager.SetSessionPassword().
+//      c) This window closes.
+//      d) MainWindow opens → all lockdown stages (1-4) activate.
 //
 // VALIDATION RULES:
+//   - Exam URL must not be empty.
+//   - If the URL lacks a scheme, "https://" is auto-prepended
+//     (unless it starts with "localhost", which gets "http://").
 //   - Password must be at least 4 characters.
-//   - Both fields must match.
-//   - The "Lock & Start Exam" button is disabled until both rules pass.
+//   - Both password fields must match.
+//   - The "Lock & Start Exam" button is disabled until ALL rules pass.
 //
 // SECURITY NOTES:
 //   - PasswordBox is used (not TextBox) to prevent shoulder-surfing.
 //   - The password string is handed to SessionManager, which stores it
 //     as char[] for deterministic memory wiping.
+//   - The URL is stored as a plain string — it is not sensitive data.
 // ============================================================================
 
 using System;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SafeExamBrowser
 {
@@ -34,8 +40,30 @@ namespace SafeExamBrowser
         {
             InitializeComponent();
 
-            // Auto-focus the first password field on load
-            Loaded += (s, e) => PasswordField.Focus();
+            // Auto-focus the URL field on load (it's the first input now)
+            Loaded += (s, e) => UrlTextBox.Focus();
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // URL FIELD — Placeholder Behavior
+        // ════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Hides the watermark placeholder when the user starts typing,
+        /// and triggers re-validation of the entire form.
+        /// </summary>
+        private void UrlTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Toggle placeholder visibility
+            if (UrlPlaceholder != null)
+            {
+                UrlPlaceholder.Visibility = string.IsNullOrEmpty(UrlTextBox.Text)
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+
+            // Re-run full form validation
+            ValidateForm();
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -44,14 +72,34 @@ namespace SafeExamBrowser
 
         /// <summary>
         /// Called whenever either PasswordBox content changes.
-        /// Performs live validation and enables/disables the Lock button.
+        /// Delegates to the unified form validator.
         /// </summary>
         private void PasswordField_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            string password = PasswordField.Password;
-            string confirm  = ConfirmPasswordField.Password;
+            ValidateForm();
+        }
 
-            // ── Rule 1: Minimum length ──────────────────────────────
+        /// <summary>
+        /// Unified form validation. Checks URL + password rules and
+        /// enables/disables the Lock button accordingly.
+        /// </summary>
+        private void ValidateForm()
+        {
+            string url      = UrlTextBox?.Text?.Trim() ?? "";
+            string password = PasswordField?.Password ?? "";
+            string confirm  = ConfirmPasswordField?.Password ?? "";
+
+            // ── Rule 1: URL must not be empty ───────────────────────
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                ValidationMessage.Text = "Please enter the exam URL.";
+                ValidationMessage.Foreground = new System.Windows.Media.SolidColorBrush(
+                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#e94560"));
+                LockButton.IsEnabled = false;
+                return;
+            }
+
+            // ── Rule 2: Minimum password length ─────────────────────
             if (password.Length < MinPasswordLength)
             {
                 ValidationMessage.Text = $"Password must be at least {MinPasswordLength} characters.";
@@ -61,7 +109,7 @@ namespace SafeExamBrowser
                 return;
             }
 
-            // ── Rule 2: Fields must match ───────────────────────────
+            // ── Rule 3: Passwords must match ────────────────────────
             if (password != confirm)
             {
                 ValidationMessage.Text = "Passwords do not match.";
@@ -72,10 +120,54 @@ namespace SafeExamBrowser
             }
 
             // ── All rules passed ────────────────────────────────────
-            ValidationMessage.Text = "✓ Passwords match. Ready to lock.";
+            ValidationMessage.Text = "✓ Ready to lock and start exam.";
             ValidationMessage.Foreground = new System.Windows.Media.SolidColorBrush(
                 (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4ecca3"));
             LockButton.IsEnabled = true;
+        }
+
+        // ════════════════════════════════════════════════════════════════
+        // URL NORMALIZATION
+        // ════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Normalizes a user-provided URL string:
+        ///   - Trims whitespace.
+        ///   - If it starts with "localhost" (with no scheme), prepends "http://".
+        ///   - Otherwise, if no scheme is present, prepends "https://".
+        ///   - Validates the result is a well-formed absolute URI.
+        /// Returns null if the URL is fundamentally invalid.
+        /// </summary>
+        private static string? NormalizeUrl(string rawUrl)
+        {
+            if (string.IsNullOrWhiteSpace(rawUrl))
+                return null;
+
+            string url = rawUrl.Trim();
+
+            // Auto-prepend scheme if missing
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                // localhost gets http:// (typical for local dev servers)
+                if (url.StartsWith("localhost", StringComparison.OrdinalIgnoreCase))
+                {
+                    url = "http://" + url;
+                }
+                else
+                {
+                    url = "https://" + url;
+                }
+            }
+
+            // Validate the result is a proper absolute URI
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri? validatedUri) &&
+                (validatedUri.Scheme == "http" || validatedUri.Scheme == "https"))
+            {
+                return validatedUri.AbsoluteUri;
+            }
+
+            return null;
         }
 
         // ════════════════════════════════════════════════════════════════
@@ -83,14 +175,33 @@ namespace SafeExamBrowser
         // ════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Stores the session password in RAM, opens MainWindow (which
-        /// activates all lockdown stages), and closes this setup window.
+        /// Validates inputs, stores the URL and password in RAM,
+        /// opens MainWindow (which activates all lockdown stages),
+        /// and closes this setup window.
         /// </summary>
         private void LockButton_Click(object sender, RoutedEventArgs e)
         {
+            string rawUrl  = UrlTextBox.Text.Trim();
             string password = PasswordField.Password;
 
-            // ── Final safety check (defense-in-depth) ───────────────
+            // ── Validate URL ────────────────────────────────────────
+            string? normalizedUrl = NormalizeUrl(rawUrl);
+
+            if (normalizedUrl == null)
+            {
+                MessageBox.Show(
+                    "The exam URL is invalid.\n\n" +
+                    "Please enter a valid URL, for example:\n" +
+                    "  • https://exam.example.com\n" +
+                    "  • localhost:3000",
+                    "Invalid URL",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                UrlTextBox.Focus();
+                return;
+            }
+
+            // ── Validate Password ───────────────────────────────────
             if (string.IsNullOrEmpty(password) || password.Length < MinPasswordLength)
             {
                 MessageBox.Show(
@@ -98,6 +209,7 @@ namespace SafeExamBrowser
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+                PasswordField.Focus();
                 return;
             }
 
@@ -108,16 +220,21 @@ namespace SafeExamBrowser
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+                ConfirmPasswordField.Focus();
                 return;
             }
 
             try
             {
+                // ── Store URL in SessionManager (RAM-only) ──────────
+                SessionManager.ExamUrl = normalizedUrl;
+
                 // ── Store password in secure RAM variable ───────────
                 SessionManager.SetSessionPassword(password);
 
-                // ── Clear the PasswordBox controls immediately ──────
-                // This removes the plaintext from WPF's internal buffer.
+                // ── Clear the input controls immediately ────────────
+                // This removes plaintext from WPF's internal buffers.
+                UrlTextBox.Clear();
                 PasswordField.Clear();
                 ConfirmPasswordField.Clear();
 
@@ -138,6 +255,7 @@ namespace SafeExamBrowser
                     MessageBoxImage.Error);
             }
         }
+
         // ════════════════════════════════════════════════════════════════
         // CANCEL
         // ════════════════════════════════════════════════════════════════
