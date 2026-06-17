@@ -7,7 +7,7 @@
   <p><strong>Xavfsiz Onlayn Imtihonlar Uchun Korporativ Darajadagi Himoyalangan Brauzer</strong></p>
 
   <!-- Nishonlar -->
-  <a href="https://github.com/Farruxjon-CODER/SafeExamBrowser-SEB-uz/releases/tag/v1.0.0"><img src="https://img.shields.io/github/v/release/Farruxjon-CODER/SafeExamBrowser-SEB-?color=blue&style=for-the-badge" alt="Reliz"></a>
+  <a href="https://github.com/Farruxjon-CODER/SafeExamBrowser-SEB-uz/releases"><img src="https://img.shields.io/github/v/release/Farruxjon-CODER/SafeExamBrowser-SEB-?color=blue&style=for-the-badge" alt="Reliz"></a>
   <a href="#"><img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet" alt=".NET 8"></a>
   <a href="#"><img src="https://img.shields.io/badge/Platform-Windows%20x64-0078D6?style=for-the-badge&logo=windows" alt="Windows"></a>
   <a href="#"><img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge" alt="Litsenziya"></a>
