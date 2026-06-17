@@ -117,12 +117,12 @@ public partial class App : Application
 
             string logEntry =
                 $"{separator}{Environment.NewLine}" +
-                $"SAFE EXAM BROWSER — CRASH REPORT{Environment.NewLine}" +
-                $"Timestamp : {timestamp}{Environment.NewLine}" +
-                $"Source    : {source}{Environment.NewLine}" +
-                $"IsTerminating: {(source.Contains("AppDomain") ? "Yes (fatal)" : "No (handled)")}{Environment.NewLine}" +
+                $"XAVFSIZ IMTIHON BRAUZERI — NOSOZLIK HISOBOTI{Environment.NewLine}" +
+                $"Vaqt       : {timestamp}{Environment.NewLine}" +
+                $"Manba     : {source}{Environment.NewLine}" +
+                $"Tugatilmoqda: {(source.Contains("AppDomain") ? "Ha (muhim)" : "Yo'q (qayta ishlangan)")}{Environment.NewLine}" +
                 $"{separator}{Environment.NewLine}" +
-                $"{(exception?.ToString() ?? "No exception details available.")}{Environment.NewLine}" +
+                $"{(exception?.ToString() ?? "Xatolik tafsilotlari mavjud emas.")}{Environment.NewLine}" +
                 $"{separator}{Environment.NewLine}{Environment.NewLine}";
 
             File.AppendAllText(CrashLogPath, logEntry);
@@ -143,10 +143,10 @@ public partial class App : Application
         try
         {
             MessageBox.Show(
-                "A critical error occurred and Safe Exam Browser must close.\n\n" +
-                $"A crash log has been saved to:\n{CrashLogPath}\n\n" +
-                "Please send this file to your IT administrator.",
-                "Safe Exam Browser — Critical Error",
+                "Muhim xatolik yuz berdi va Xavfsiz imtihon brauzeri yopilishi kerak.\n\n" +
+                $"Nosozlik hisoboti quyidagi manzilga saqlandi:\n{CrashLogPath}\n\n" +
+                "Iltimos, ushbu faylni IT administratoringizga yuboring.",
+                "Xavfsiz imtihon brauzeri — Muhim xatolik",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error
             );

@@ -92,7 +92,7 @@ namespace SafeExamBrowser
             // ── Rule 1: URL must not be empty ───────────────────────
             if (string.IsNullOrWhiteSpace(url))
             {
-                ValidationMessage.Text = "Please enter the exam URL.";
+                ValidationMessage.Text = "Iltimos, imtihon URL manzilini kiriting.";
                 ValidationMessage.Foreground = new System.Windows.Media.SolidColorBrush(
                     (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#e94560"));
                 LockButton.IsEnabled = false;
@@ -102,7 +102,7 @@ namespace SafeExamBrowser
             // ── Rule 2: Minimum password length ─────────────────────
             if (password.Length < MinPasswordLength)
             {
-                ValidationMessage.Text = $"Password must be at least {MinPasswordLength} characters.";
+                ValidationMessage.Text = $"Parol kamida {MinPasswordLength} ta belgidan iborat bo'lishi kerak.";
                 ValidationMessage.Foreground = new System.Windows.Media.SolidColorBrush(
                     (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#e94560"));
                 LockButton.IsEnabled = false;
@@ -112,7 +112,7 @@ namespace SafeExamBrowser
             // ── Rule 3: Passwords must match ────────────────────────
             if (password != confirm)
             {
-                ValidationMessage.Text = "Passwords do not match.";
+                ValidationMessage.Text = "Parollar mos kelmaydi.";
                 ValidationMessage.Foreground = new System.Windows.Media.SolidColorBrush(
                     (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#e94560"));
                 LockButton.IsEnabled = false;
@@ -120,7 +120,7 @@ namespace SafeExamBrowser
             }
 
             // ── All rules passed ────────────────────────────────────
-            ValidationMessage.Text = "✓ Ready to lock and start exam.";
+            ValidationMessage.Text = "✓ Qulflash va imtihonni boshlashga tayyor.";
             ValidationMessage.Foreground = new System.Windows.Media.SolidColorBrush(
                 (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4ecca3"));
             LockButton.IsEnabled = true;
@@ -190,11 +190,11 @@ namespace SafeExamBrowser
             if (normalizedUrl == null)
             {
                 MessageBox.Show(
-                    "The exam URL is invalid.\n\n" +
-                    "Please enter a valid URL, for example:\n" +
+                    "Imtihon URL manzili noto'g'ri.\n\n" +
+                    "Iltimos, to'g'ri URL manzilini kiriting, masalan:\n" +
                     "  • https://exam.example.com\n" +
                     "  • localhost:3000",
-                    "Invalid URL",
+                    "Noto'g'ri URL",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 UrlTextBox.Focus();
@@ -205,8 +205,8 @@ namespace SafeExamBrowser
             if (string.IsNullOrEmpty(password) || password.Length < MinPasswordLength)
             {
                 MessageBox.Show(
-                    "Please enter a valid password before proceeding.",
-                    "Validation Error",
+                    "Iltimos, davom etishdan oldin to'g'ri parolni kiriting.",
+                    "Tekshirish xatosi",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 PasswordField.Focus();
@@ -216,8 +216,8 @@ namespace SafeExamBrowser
             if (password != ConfirmPasswordField.Password)
             {
                 MessageBox.Show(
-                    "Passwords do not match. Please re-enter.",
-                    "Validation Error",
+                    "Parollar mos kelmaydi. Iltimos, qaytadan kiriting.",
+                    "Tekshirish xatosi",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 ConfirmPasswordField.Focus();
@@ -249,8 +249,8 @@ namespace SafeExamBrowser
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Failed to initialize session:\n\n{ex.Message}",
-                    "Critical Error",
+                    $"Sessiyani ishga tushirib bo'lmadi:\n\n{ex.Message}",
+                    "Muhim xatolik",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }

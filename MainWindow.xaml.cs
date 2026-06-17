@@ -115,10 +115,10 @@ namespace SafeExamBrowser
                 Log("Please restart the application as Administrator.");
 
                 MessageBox.Show(
-                    "Safe Exam Browser should be run as Administrator " +
-                    "for full security protection.\n\n" +
-                    "Some features may not work correctly.",
-                    "Warning — Reduced Security",
+                    "Xavfsiz imtihon brauzeri to'liq xavfsizlik himoyasi uchun " +
+                    "Administrator sifatida ishga tushirilishi kerak.\n\n" +
+                    "Ba'zi funksiyalar to'g'ri ishlamasligi mumkin.",
+                    "Ogohlantirish — Xavfsizlik darajasi pasaytirilgan",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning
                 );
@@ -266,10 +266,10 @@ namespace SafeExamBrowser
                 Log($"✗ Stage 1 CRITICAL FAILURE: {ex.Message}");
 
                 MessageBox.Show(
-                    "Failed to initialize the secure browser.\n\n" +
-                    "Please ensure Microsoft Edge WebView2 Runtime is installed.\n\n" +
-                    $"Error: {ex.Message}",
-                    "Safe Exam Browser — Critical Error",
+                    "Xavfsiz brauzerni ishga tushirib bo'lmadi.\n\n" +
+                    "Iltimos, Microsoft Edge WebView2 Runtime o'rnatilganligini tekshiring.\n\n" +
+                    $"Xatolik: {ex.Message}",
+                    "Xavfsiz imtihon brauzeri — Muhim xatolik",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );

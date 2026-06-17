@@ -59,7 +59,7 @@ namespace SafeExamBrowser.Config
         public const string AdminPassword = "admin123";
 
         // ── Window Title ────────────────────────────────────────────────
-        public const string WindowTitle = "Safe Exam Browser";
+        public const string WindowTitle = "Xavfsiz imtihon brauzeri";
 
         // ── WebView2 User Data Folder ───────────────────────────────────
         /// <summary>

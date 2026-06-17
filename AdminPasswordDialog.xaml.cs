@@ -99,7 +99,7 @@ namespace SafeExamBrowser
             // ── Empty input guard ───────────────────────────────────
             if (string.IsNullOrEmpty(entered))
             {
-                ShowFailure("Please enter a password.");
+                ShowFailure("Iltimos, parolni kiriting.");
                 return;
             }
 
@@ -127,7 +127,7 @@ namespace SafeExamBrowser
             else
             {
                 // ── Authentication FAILED ───────────────────────────
-                ShowFailure("Incorrect password. Access denied.");
+                ShowFailure("Parol noto'g'ri. Kirish rad etildi.");
             }
         }
 
@@ -139,7 +139,7 @@ namespace SafeExamBrowser
         {
             MessageBox.Show(
                 message,
-                "Authentication Failed",
+                "Autentifikatsiya muvaffaqiyatsiz",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
 
